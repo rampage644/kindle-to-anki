@@ -5,6 +5,7 @@ import csv
 import os
 import pprint
 import re
+import retrying
 import service
 import sqlite3
 import sys
@@ -57,15 +58,11 @@ def extract_filename_from_url(url):
     path = urllib.parse.urlparse(url).path
     return os.path.split(path)[-1]
 
+@retrying.retry(stop_max_attempt_number=3)
 def download_file(url, path=''):
-    try:
-        res = urllib.request.urlretrieve(url,
-                                         os.path.join(path,
-                                                      extract_filename_from_url(url)))
-    except:
-        res = urllib.request.urlretrieve(url,
-                                         os.path.join(path,
-                                                      extract_filename_from_url(url)))
+    res = urllib.request.urlretrieve(url,
+                                     os.path.join(path,
+                                                  extract_filename_from_url(url)))
     return res
 
 def write_to_csv(file, data):
@@ -113,12 +110,18 @@ if __name__ == '__main__':
         tr, transcription, sound_url, img_url = translate(lingualeo, word)
         if sound_url:
             print ('ok, get sound...', end='', flush=True)
-            sound, _ = download_file(sound_url, media_path)
-            sound = os.path.basename(sound)
+            try:
+                sound, _ = download_file(sound_url, media_path)
+                sound = os.path.basename(sound)
+            except:
+                sound = ''
         if img_url:
             print ('ok, get image...', end='', flush=True)
-            img, _ = download_file(img_url, media_path)
-            img = os.path.basename(img)
+            try:
+                img, _ = download_file(img_url, media_path)
+                img = os.path.basename(img)
+            except:
+                img = ''
         print ('ok!')
         data.append((word, transcription, '[sound:{}]'.format(sound),
                      tr, img, highlight_word_in_context(word, context)))
