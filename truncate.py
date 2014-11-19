@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import config
 import sqlite3
-
+import argparse
+import sys
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -12,7 +12,6 @@ if __name__ == '__main__':
     conn = sqlite3.connect(args.kindle)
     conn.execute("delete from WORDS;")
     conn.execute("delete from LOOKUPS;")
-    conn.execute("update metadata set sscnt = 0 where id in ('WORDS', 'LOOKUPS');")
     conn.commit()
     conn.close()
 
