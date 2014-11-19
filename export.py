@@ -78,14 +78,14 @@ def highlight_word_in_context(word, context):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--kindle', help='Path to kindle db file (usually vocab.db)', default='vocab.db')
+    parser.add_argument('--kindle', help='Path to kindle db file (usually vocab.db)')
+    parser.add_argument('--src', help='Path to plain text file with newline separated list of words')
     parser.add_argument('-m', '--media-path', help='Where to store media files (sounds/images)')
     parser.add_argument('email', help='LinguaLeo account email/login')
     parser.add_argument('pwd', help='LinguaLeo account password')
     parser.add_argument('-o', '--out', help='Output filename', default='output.csv')
     parser.add_argument('-s', '--skip', help='Number of words to skip', default=0, type=int)
     args = parser.parse_args()
-    kindle = args.kindle
     media_path = args.media_path if args.media_path else ''
     output = args.out if args.out else sys.stdout
     email = args.email if args.email else ''
@@ -97,7 +97,13 @@ if __name__ == '__main__':
         print (res['error_msg'])
         sys.exit(1)
 
-    lookups = get_lookups(kindle)
+    if args.kindle:
+        lookups = get_lookups(args.kindle)
+    elif args.src:
+        lookups = [(word.strip(), '') for word in open(args.src, 'r').readlines()]
+    else:
+        print ("No input specified")
+        sys.exit(1)
 
     data = []
     for i, (word, context) in enumerate(lookups):
