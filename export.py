@@ -16,7 +16,7 @@ import urllib.request
 def get_lookups(db, timestamp=0):
     conn = sqlite3.connect(db)
     res = []
-    for row in conn.execute('select w.stem,l.usage from LOOKUPS as l JOIN WORDS as w on l.word_key=w.id where l.timestamp>?;', (timestamp, )):
+    for row in conn.execute('select w.stem,l.usage from WORDS as w LEFT JOIN LOOKUPS as l on w.id=l.word_key;'):
         res.append(row)
     conn.close()
     return res
@@ -123,6 +123,8 @@ if __name__ == '__main__':
             except:
                 img = ''
         print ('ok!')
+        if not context:
+            context = ''
         data.append((word, transcription, '[sound:{}]'.format(sound),
                      tr, img, highlight_word_in_context(word, context)))
 
