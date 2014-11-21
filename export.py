@@ -135,9 +135,10 @@ if __name__ == '__main__':
         data.append((word, transcription, '[sound:{}]'.format(sound),
                      tr, img, highlight_word_in_context(word, context)))
 
-    print ('[100%]\tWrite to file {}...'.format(output), end='', flush=True)
-    write_to_csv(output, data)
-    if args.kindle:
-        update_last_timestamp(get_last_timestamp_from_lookup(args.kindle))
-    print ('ok!')
+    if len(lookups):
+        print ('[100%]\tWrite to file {}...'.format(output), end='', flush=True)
+        write_to_csv(output, data)
+        if args.kindle:
+            update_last_timestamp(get_last_timestamp_from_lookup(args.kindle))
+        print ('ok!')
     sys.exit(0)
