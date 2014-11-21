@@ -13,10 +13,12 @@ import urllib
 import urllib.parse
 import urllib.request
 
+TIMESTAMP_PATH = '/home/ramp/.kindle'
+
 def get_lookups(db, timestamp=0):
     conn = sqlite3.connect(db)
     res = []
-    for row in conn.execute('select w.stem,l.usage from WORDS as w LEFT JOIN LOOKUPS as l on w.id=l.word_key;'):
+    for row in conn.execute('select w.stem,l.usage from WORDS as w LEFT JOIN LOOKUPS as l on w.id=l.word_key where w.timestamp>?;', (timestamp,)):
         res.append(row)
     conn.close()
     return res
@@ -27,19 +29,17 @@ def get_last_timestamp_from_lookup(db):
     conn.close()
     return res[0][0] if len (res) > 0 else None
 
-def get_last_timestamp(db):
-    conn = sqlite3.connect(db)
-    res = conn.execute('select time from timestamps order by time desc limit 1;').fetchall()
-    conn.close()
-    return res[0][0] if len (res) > 0 else None
+def get_last_timestamp():
+    try:
+        with open(TIMESTAMP_PATH, 'r') as tfile:
+            return int(tfile.readline().strip())
+    except Exception as e:
+        print (e)
+        return 0
 
-def update_last_timestamp(db, timestamp):
-    conn = sqlite3.connect(db)
-    conn.execute('create table if not exists timestamps (time timestamp);')
-    conn.execute('insert into timestamps values(?);', (timestamp,))
-    conn.commit()
-    conn.close()
-    
+def update_last_timestamp(timestamp):
+    with open(TIMESTAMP_PATH, 'w') as tfile:
+        tfile.write('{}'.format(timestamp))    
 
 
 def translate(lingualeo, word):
@@ -98,7 +98,8 @@ if __name__ == '__main__':
         sys.exit(1)
 
     if args.kindle:
-        lookups = get_lookups(args.kindle)
+        timestamp = get_last_timestamp()
+        lookups = get_lookups(args.kindle, timestamp)
     elif args.src:
         lookups = [(word.strip(), '') for word in open(args.src, 'r').readlines()]
     else:
@@ -136,5 +137,7 @@ if __name__ == '__main__':
 
     print ('[100%]\tWrite to file {}...'.format(output), end='', flush=True)
     write_to_csv(output, data)
+    if args.kindle:
+        update_last_timestamp(get_last_timestamp_from_lookup(args.kindle))
     print ('ok!')
     sys.exit(0)
