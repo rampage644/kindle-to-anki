@@ -89,7 +89,6 @@ if __name__ == '__main__':
     parser.add_argument('email', help='LinguaLeo account email/login')
     parser.add_argument('pwd', help='LinguaLeo account password')
     parser.add_argument('-o', '--out', help='Output filename', default='output.csv')
-    parser.add_argument('-s', '--skip', help='Number of words to skip', default=0, type=int)
     args = parser.parse_args()
     media_path = args.media_path if args.media_path else ''
     output = args.out if args.out else sys.stdout
@@ -113,9 +112,6 @@ if __name__ == '__main__':
 
     data = []
     for i, (word, context) in enumerate(lookups):
-        if i < args.skip:
-            continue
-
         progress = int(100.0 * i / len(lookups))
         print ('[{}%]\ttranslate {}...'.format(progress, word), 
                end='', flush=True)
