@@ -23,6 +23,11 @@ def get_lookups(db, timestamp=0):
     conn.close()
     return res
 
+def get_lookups_from_file(file):
+    lookups = [(line.split()[0], 
+                ' '.join(line.split()[1:])) for line in open(file, 'r').readlines()]
+    return lookups
+
 def get_last_timestamp_from_lookup(db):
     conn = sqlite3.connect(db)
     res = conn.execute('select timestamp from WORDS order by timestamp desc limit 1;').fetchall()
@@ -101,7 +106,7 @@ if __name__ == '__main__':
         timestamp = get_last_timestamp()
         lookups = get_lookups(args.kindle, timestamp)
     elif args.src:
-        lookups = [(word.strip(), '') for word in open(args.src, 'r').readlines()]
+        lookups = get_lookups_from_file(args.src)
     else:
         print ("No input specified")
         sys.exit(1)
