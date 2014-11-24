@@ -13,7 +13,7 @@ import urllib
 import urllib.parse
 import urllib.request
 
-TIMESTAMP_PATH = '/home/ramp/.kindle'
+TIMESTAMP_PATH = os.path.expanduser('~/.kinlde')
 
 def get_lookups(db, timestamp=0):
     conn = sqlite3.connect(db)
