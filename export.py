@@ -54,7 +54,8 @@ def translate(lingualeo, word):
     pic_url = result['translate'][0]['pic_url']
     # tr = result['translate'][0]['value']
     tr = [i['value'] for i in result['translate']][:3]
-    tr = '<br>'.join(tr)
+    # remove duplicates
+    tr = '<br>'.join(list(set(tr)))
     transcription = result['transcription']
 
     return (tr, transcription, sound_url, pic_url)
