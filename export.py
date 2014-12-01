@@ -134,6 +134,9 @@ if __name__ == '__main__':
         print ('ok!')
         if not context:
             context = ''
+        # remove all kinds of quotes/backticks as Anki sometimes has troubles
+        # with them
+        context = re.sub(r'[\'"`]', '', context)
         data.append((word, transcription, '[sound:{}]'.format(sound),
                      tr, img, highlight_word_in_context(word, context)))
 
